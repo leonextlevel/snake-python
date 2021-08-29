@@ -1,8 +1,5 @@
-import assets
 import sys, pygame
 
-from pygame import Rect
-from pygame import draw
 from pygame.event import Event
 
 from assets.entity import Snake, Food
@@ -21,24 +18,34 @@ def main():
     MOVE_EVENT = Event(666)
     pygame.time.set_timer(MOVE_EVENT, 100)
 
-    while True:
-        has_collision = False
+    gameover = False
+    snake_increment = False
+    snake_collision = False
+    while not gameover:
         SCREEN.fill(BLACK)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                gameover = True
             if event == MOVE_EVENT:
-                snake.move()
-                has_collision = snake.has_collision(food.body)
-        if has_collision:
+                is_move_possible = snake.move(SCREEN)
+                if not is_move_possible:
+                    gameover = True
+                snake_collision = snake.has_collision(*snake.body[1:])
+                snake_increment = snake.has_collision(food.body)
+        if snake_collision:
+            gameover = True
+        if snake_increment:
             snake.increment()
+            snake_increment = False
             food.reposition(SCREEN)
         food.draw(SCREEN)
         snake.draw(SCREEN)
         snake.key_handler()
         pygame.display.flip()
         clock.tick(60)
+
+    pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":

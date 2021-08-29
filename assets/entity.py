@@ -46,24 +46,43 @@ class Snake(Model):
     def increment(self):
         self.body.append(self.body[-1].copy())
 
-    def move(self):
+    def move(self, surface):
         for index, part in reversed(list(enumerate(self.body[1:], 1))):
             part.x = self.body[index - 1].x
             part.y = self.body[index - 1].y
-        self.body[0].move_ip(*[value * self.SIZE for value in self.DIRECTIONS[self.direction]])
+        self.body[0].move_ip(
+            *[
+                value * self.SIZE
+                for value in self.DIRECTIONS[self.direction]
+            ]
+        )
+        # Verifica se bateu na parede
+        if (
+            self.body[0].x < 0 or
+            self.body[0].x > surface.get_width() - self.SIZE or
+            self.body[0].y < 0 or
+            self.body[0].y > surface.get_height() - self.SIZE
+        ):
+            # Sinaliza que mover não é possivel
+            return False
+        return True
+        
 
-    def has_collision(self, obj):
-        return self.body[0].colliderect(obj)
+    def has_collision(self, *objs):
+        for obj in objs:
+            if self.body[0].colliderect(obj):
+                return True
+        return False
 
     def key_handler(self):
         key = pygame.key.get_pressed()
-        if key[pygame.K_LEFT]:
+        if key[pygame.K_LEFT] and self.direction != 'right':
             self.direction = 'left'
-        if key[pygame.K_RIGHT]:
+        if key[pygame.K_RIGHT] and self.direction != 'left':
             self.direction = 'right'
-        if key[pygame.K_UP]:
+        if key[pygame.K_UP] and self.direction != 'down':
             self.direction = 'up'
-        if key[pygame.K_DOWN]:
+        if key[pygame.K_DOWN] and self.direction != 'up':
             self.direction = 'down'
 
     def draw(self, surface):
