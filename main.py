@@ -16,7 +16,7 @@ def main():
     pygame.init()
 
     MOVE_EVENT = Event(666)
-    pygame.time.set_timer(MOVE_EVENT, 100)
+    pygame.time.set_timer(MOVE_EVENT, 150)
 
     gameover = False
     snake_increment = False
@@ -37,7 +37,7 @@ def main():
         if snake_increment:
             snake.increment()
             snake_increment = False
-            food.reposition(SCREEN)
+            food.reposition(SCREEN, *snake.body)
         food.draw(SCREEN)
         snake.draw(SCREEN)
         snake.key_handler()

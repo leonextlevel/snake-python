@@ -15,11 +15,25 @@ class Food(Model):
     def draw(self, surface):
         pygame.draw.rect(surface, self.COLOR, self.body)
 
-    def reposition(self, surface):
+
+    def reposition(self, surface, *other_objs):
+        fill_positions = [
+            (obj.x, obj.y)
+            for obj in other_objs
+        ]
         x = randint(0, (surface.get_width() // self.SIZE) - 1) * self.SIZE
         y = randint(0, (surface.get_height() // self.SIZE) - 1) * self.SIZE
+        while (x, y) in fill_positions:
+            if x < surface.get_width() - self.SIZE:
+                x += self.SIZE
+            elif y < surface.get_height() - self.SIZE:
+                y += self.SIZE
+            else:
+                # Não é mais possível reposicionar
+                return False
         self.body.x = x
         self.body.y = y
+        return True
 
 
 class Snake(Model):
